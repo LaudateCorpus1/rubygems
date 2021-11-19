@@ -502,7 +502,7 @@ module Bundler
                              "removed in order to install."
         end
 
-        raise GemNotFound, "Could not find #{missing_specs.map(&:full_name).join(", ")} in any of the sources"
+        raise GemNotFound, "Could not find #{missing_specs.map(&:full_name).join(" nor ")} in locally installed gems"
       end
 
       unless specs["bundler"].any?
