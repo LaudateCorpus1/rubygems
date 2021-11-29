@@ -198,6 +198,18 @@ module Bundler
       filesystem_access(gemfile_path) {|g| File.open(g, "w") {|file| file.puts contents } }
     end
 
+    def clean_load_path
+      bundler_lib = bundler_ruby_lib
+
+      loaded_gem_paths = Bundler.rubygems.loaded_gem_paths
+
+      $LOAD_PATH.reject! do |p|
+        next if resolve_path(p).start_with?(bundler_lib)
+        loaded_gem_paths.delete(p)
+      end
+      $LOAD_PATH.uniq!
+    end
+
     private
 
     def validate_bundle_path
@@ -310,18 +322,6 @@ module Bundler
 
     def bundler_ruby_lib
       resolve_path File.expand_path("../..", __FILE__)
-    end
-
-    def clean_load_path
-      bundler_lib = bundler_ruby_lib
-
-      loaded_gem_paths = Bundler.rubygems.loaded_gem_paths
-
-      $LOAD_PATH.reject! do |p|
-        next if resolve_path(p).start_with?(bundler_lib)
-        loaded_gem_paths.delete(p)
-      end
-      $LOAD_PATH.uniq!
     end
 
     def resolve_path(path)

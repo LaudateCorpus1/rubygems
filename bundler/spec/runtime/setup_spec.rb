@@ -828,37 +828,6 @@ end
     expect(out).to eq("yay")
   end
 
-  it "should clean $LOAD_PATH properly", :ruby_repo do
-    gem_name = "very_simple_binary"
-    full_gem_name = gem_name + "-1.0"
-    ext_dir = File.join(tmp("extensions", full_gem_name))
-
-    system_gems full_gem_name
-
-    install_gemfile <<-G
-      source "#{file_uri_for(gem_repo1)}"
-    G
-
-    ruby <<-R
-      s = Gem::Specification.find_by_name '#{gem_name}'
-      s.extension_dir = '#{ext_dir}'
-
-      # Don't build extensions.
-      s.class.send(:define_method, :build_extensions) { nil }
-
-      require 'bundler'
-      gem '#{gem_name}'
-
-      puts $LOAD_PATH.count {|path| path =~ /#{gem_name}/} >= 2
-
-      Bundler.setup
-
-      puts $LOAD_PATH.count {|path| path =~ /#{gem_name}/} == 0
-    R
-
-    expect(out).to eq("true\ntrue")
-  end
-
   context "with bundler is located in symlinked GEM_HOME" do
     let(:gem_home) { Dir.mktmpdir }
     let(:symlinked_gem_home) { Tempfile.new("gem_home").path }

@@ -149,6 +149,7 @@ module Bundler
         # Load all groups, but only once
         @setup = load.setup
       else
+        SharedHelpers.clean_load_path
         load.setup(*groups)
       end
     end
